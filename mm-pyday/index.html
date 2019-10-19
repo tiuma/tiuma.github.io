@@ -1,0 +1,232 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>reveal.js</title>
+
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/black.css">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="lib/css/monokai.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+        document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
+</head>
+<body>
+<div class="reveal">
+    <div class="slides">
+        <section>
+            <h2>1, 2, 3, Slack app y listo!</h2>
+            <h4>Desarrollo de apps para slack con Python</h4>
+            <h6>(o mas huevadas que se pueden hacer con Python)</h6>
+            <p>
+                <small>Por <a href="https://github.com/tiuma">Lic. Mario Moya</a></small>
+            </p>
+        </section>
+
+        <!--				<section>-->
+        <!--					<h2>¿Quién es este tipo?</h2>-->
+        <!--					<div class="container">-->
+        <!--						<div class="col">-->
+        <!--							<img src="images/whoareyou.gif">-->
+        <!--						</div>-->
+        <!--						<div class="col">-->
+        <!--							<ul>-->
+        <!--								<li>Egresado de FAI</li>-->
+        <!--								<li>Docente en FAI</li>-->
+        <!--								<li>Emprendedor/Profesional independiente</li>-->
+        <!--							</ul>-->
+        <!--						</div>-->
+
+        <!--					</div>-->
+        <!--				</section>-->
+
+        <section>
+            <h1>Conocen slack?</h1>
+            <ul>
+                <li>Plataforma de colaboración para equipos</li>
+                <li>Conversaciones bien organizadas</li>
+                <li>Canales</li>
+                <li>Permite compartir archivos, chat de voz, chat de video</li>
+            </ul>
+        </section>
+        <section>
+            <iframe width="800" height="600" src="https://www.youtube.com/embed/9RJZMSsH7-g" data-autoplay></iframe>
+
+
+        </section>
+        <section>
+            <h1>Que son las `Slack apps`</h1>
+            <p>Slack apps extienden y expanden las capacidades de un espacio de trabajo de Slack.</p>
+            <aside class="notes">
+                Comentar ejemplos, TODO list, agenda, consultar el tiempo, la cotizacion del dolar hoy.
+            </aside>
+        </section>
+        <section>
+            <h2>¿Qué características puede incluir una app de Slack?</h2>
+            <ul>
+                <li>Mensajes/notificaciones</li>
+                <li>Slash commands</li>
+                <li>Acciones</li>
+                <li>Bots</li>
+            </ul>
+        </section>
+        <section>
+            <h1>Caso MontelCare</h1>
+            <ul>
+                <li>MontelCare es un servicio de monitoreo de infraestructura en la nube las 24 hs.</li>
+                <li>Muchos de los clientes de MontelCare utilizan slack para sus equipos de trabajo internos</li>
+                <li>Se desarrolló la App para que el cliente pudiera gestionar algunos aspectos de su servicio</li>
+            </ul>
+            <aside class="notes">
+                Comentar un poco de la app.
+                Que esta desarrollada con Django, el backend, y que interactua con la API de Slack utilizando DRF.
+                mostrar la app en funcionamiento???
+            </aside>
+        </section>
+        <section>
+            <h3>Caso MontelCare. Notificaciones</h3>
+            <img src="images/mc-alert.png">
+        </section>
+        <section>
+            <h3>Caso MontelCare. Comandos/acciones</h3>
+            <img src="images/mc-status.png">
+        </section>
+        <section>
+            <h2>¿Cómo hacemos una Slack app?</h2>
+            <h4>Requisitos mínimos: un editor, python3, conocimientos básicos para manipular un JSON</h4>
+            <aside class="notes">
+                JSON (acrónimo de JavaScript Object Notation, «notación de objeto de JavaScript») es un formato de texto
+                sencillo para el intercambio de datos.
+            </aside>
+        </section>
+        <section>
+            <h2>Veamos un ejemplo sencillo</h2>
+            Ingresemos a <a href="http://api.slack.com">http://api.slack.com</a> y creemos una app
+
+        </section>
+		<section>
+			<h2>Eventos de Slack</h2>
+			<blockquote>When an event in your subscription occurs in an authorized user's account, we'll send an HTTP POST request to your Request URL. The event will be in the Content-Type: application/json format:</blockquote>
+		</section>
+        <section>
+			<pre><code class="hljs">
+{
+        "token": "XXYYZZ",
+        "team_id": "TXXXXXXXX",
+        "api_app_id": "AXXXXXXXXX",
+        "event": {
+                "type": "name_of_event",
+                "event_ts": "1234567890.123456",
+                "user": "UXXXXXXX1",
+                ...
+        },
+        "type": "event_callback",
+        "authed_users": [
+                "UXXXXXXX1",
+                "UXXXXXXX2"
+        ],
+        "event_id": "Ev08MFMKH6",
+        "event_time": 1234567890
+}
+			</code></pre>
+        </section>
+		<section>
+			<h3>Recuperamos los datos del JSON anterior</h3>
+			<pre>
+				<code>
+def post(self, request):
+	payload = request.data
+	# `type` This reflects the type of callback you're receiving. Typically, that is `event_callback`.
+	#  You may encounter `url_verification` during the configuration process.
+	message_type = payload.get('type')
+
+	# verification challenge
+	if message_type == 'url_verification':
+		return Response(payload.get('challenge'), status=status.HTTP_200_OK)
+	elif message_type == 'event_callback':
+				</code>
+			</pre>
+		</section>
+		<section>
+			<h3>Recuperamos los datos del JSON anterior</h3>
+			<pre>
+				<code>
+if 'event' in payload:
+	event_message = payload.get('event')
+	event_type = event_message.get('type')
+	event_ts = event_message.get('ts')
+	thread_ts = event_message.get('thread_ts', None)
+	# process user's message
+	user = event_message.get('user')
+	text = event_message.get('text')
+	channel = event_message.get('channel')
+				</code>
+			</pre>
+		</section>
+		<section>
+			<h3>Hacemos que el bot reaccione a una mención</h3>
+			<pre>
+				<code>
+if event_type == 'app_mention':
+	# TODO add some condition to react to the mention, eg, if 'hi' in text.lower():
+	response_text = f'Hello :wave: <@{user}>'
+	sc.chat_postMessage(
+		channel=channel,
+		text=response_text,
+		thread_ts=thread_ts
+	)
+				</code>
+			</pre>
+		</section>
+		<section>
+			<h3>... o a un mensaje específico:</h3>
+			<pre>
+				<code>
+if event_type == 'message':
+	if text == 'how are you?':
+		# response_text = self.get_message_to_respond()
+		sc.chat_postMessage(
+			channel=channel,
+			text='fine. tks',
+			thread_ts=thread_ts
+		)
+				</code>
+			</pre>
+		</section>
+		<section>
+			<h1>Lo probamos?</h1>
+		</section>
+		<section>
+			<h1>Muchas gracias!!</h1>
+		</section>
+    </div>
+</div>
+
+<script src="js/reveal.js"></script>
+
+<script>
+    // More info about config & dependencies:
+    // - https://github.com/hakimel/reveal.js#configuration
+    // - https://github.com/hakimel/reveal.js#dependencies
+    Reveal.initialize({
+        dependencies: [
+            {src: 'plugin/markdown/marked.js'},
+            {src: 'plugin/markdown/markdown.js'},
+            {src: 'plugin/notes/notes.js', async: true},
+            {src: 'plugin/highlight/highlight.js', async: true}
+        ]
+    });
+</script>
+</body>
+</html>
